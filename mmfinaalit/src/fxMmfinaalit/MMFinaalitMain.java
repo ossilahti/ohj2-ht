@@ -11,7 +11,7 @@ public class MMFinaalitMain extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("MMFinaalitGUIView.fxml"));
+			BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("StartingWindow.fxml"));
 			Scene scene = new Scene(root,400,400);
 			scene.getStylesheets().add(getClass().getResource("mmfinaalit.css").toExternalForm());
 			primaryStage.setScene(scene);
