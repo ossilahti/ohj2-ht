@@ -1,6 +1,7 @@
 package fxMmfinaalit;
 	
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
 import tietorakenne.Tietokanta;
 import javafx.scene.Scene;
@@ -23,16 +24,21 @@ public class MMFinaalitMain extends Application {
             
             // Platform.setImplicitExit(false); // tätä ei kai saa laittaa
 
-           // primaryStage.setOnCloseRequest((event) -> {
-             //       if ( !tietokantaCtrl.voikoSulkea() ) event.consume();
-               // });
-            
+            // primaryStage.setOnCloseRequest((event) -> {
+            //     if ( !tietokantaCtrl.voikoSulkea() ) event.consume();
+            //  });
+        
             Tietokanta tietokanta = new Tietokanta();  
             tietokantaCtrl.setTietokanta(tietokanta); 
-           
-            
+        
             primaryStage.show();
-            //if ( !tietokantaCtrl.avaa() ) Platform.exit();
+        
+            Application.Parameters params = getParameters(); 
+            if ( params.getRaw().size() > 0 ) 
+            	tietokantaCtrl.lueTiedosto(params.getRaw().get(0));  
+
+        
+
         } catch(Exception e) {
             e.printStackTrace();
         }

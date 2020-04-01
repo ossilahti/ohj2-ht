@@ -1,5 +1,6 @@
 package tietorakenne;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -92,6 +93,10 @@ public class Tietokanta {
         finaalit.talleta();
         osallistujamaat.talleta();
     }
+    
+    public Collection<Finaali> etsi(String hakuehto) throws SailoException { 
+        return finaalit.etsi(hakuehto); 
+    } 
 
 
     /**

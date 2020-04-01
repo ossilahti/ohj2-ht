@@ -2,6 +2,8 @@ package tietorakenne;
 
 import java.io.*;
 
+import fi.jyu.mit.ohj2.Mjonot;
+
 /**
  * Osallistujamaa, joka osaa huolehtia tunnusnrostaan.
  * 
@@ -11,8 +13,7 @@ import java.io.*;
 public class Osallistujamaa {
     private int tunnusNro;
     private int finaaliNro;
-    private String voittajajoukkue;
-    private String hopeajoukkue;
+    private String osallistujamaa;
 
     private static int seuraavaNro = 1;
 
@@ -36,13 +37,11 @@ public class Osallistujamaa {
 
     /**
      * Apumetodi, jolla saadaan täytettyä testiarvot Osallistujamaalle.
-     * TODO: pitää saada jotenkin erilaiset osallistujamaat.
      * @param nro viite finaaliin, jonka osallistujamaista on kyse
      */
     public void testiOsallistujamaa(int finaalinViiteNro) {
         finaaliNro = finaalinViiteNro;
-        voittajajoukkue = "Argentiina";
-        hopeajoukkue = "Saksa";
+        osallistujamaa = "Argentiina";
     }
     
     
@@ -51,7 +50,7 @@ public class Osallistujamaa {
      * @param out tietovirta johon tulostetaan
      */
     public void tulosta(PrintStream out) {
-        out.println("Finaali numero: " + finaaliNro + " || " + "Voittajamaa: " + voittajajoukkue + " || Hopeajoukkue: " + hopeajoukkue);
+        out.println("Finaali numero: " + finaaliNro + " || " + "Voittajamaa: " + osallistujamaa);
     }
 
 
@@ -92,7 +91,67 @@ public class Osallistujamaa {
         return finaaliNro;
     }
 
+    /**
+     * Asettaa tunnusnumeron ja samalla varmistaa että
+     * seuraava numero on aina suurempi kuin tähän mennessä suurin.
+     * @param nr asetettava tunnusnumero
+     */
+    private void setTunnusNro(int nr) {
+        tunnusNro = nr;
+        if ( tunnusNro >= seuraavaNro ) seuraavaNro = tunnusNro + 1;
+    }
 
+
+    /**
+     * Palauttaa osallistujamaan tiedot merkkijonona jonka voi tallentaa tiedostoon.
+     * @return maat tolppaeroteltuna merkkijonona 
+     *
+     */
+    @Override
+    public String toString() {
+        return "" + getTunnusNro() + "|" + finaaliNro + "|" + osallistujamaa+ "|";
+    }
+
+
+    /**
+     * Selvitää harrastuksen tiedot | erotellusta merkkijonosta.
+     * Pitää huolen että seuraavaNro on suurempi kuin tuleva tunnusnro.
+     * @param rivi josta harrastuksen tiedot otetaan
+     * @example
+     * <pre name="test">
+     *   Harrastus harrastus = new Harrastus();
+     *   harrastus.parse("   2   |  10  |   Kalastus  | 1949 | 22 t ");
+     *   harrastus.getJasenNro() === 10;
+     *   harrastus.toString()    === "2|10|Kalastus|1949|22";
+     *   
+     *   harrastus.rekisteroi();
+     *   int n = harrastus.getTunnusNro();
+     *   harrastus.parse(""+(n+20));
+     *   harrastus.rekisteroi();
+     *   harrastus.getTunnusNro() === n+20+1;
+     *   harrastus.toString()     === "" + (n+20+1) + "|10|Kalastus|1949|22";
+     * </pre>
+     */
+    public void parse(String rivi) {
+        StringBuffer sb = new StringBuffer(rivi);
+        setTunnusNro(Mjonot.erota(sb, '|', getTunnusNro()));
+        finaaliNro = Mjonot.erota(sb, '|', finaaliNro);
+        osallistujamaa = Mjonot.erota(sb, '|', osallistujamaa);
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if ( obj == null ) return false;
+        return this.toString().equals(obj.toString());
+    }
+    
+
+    @Override
+    public int hashCode() {
+        return tunnusNro;
+    }
+    
     /**
      * Testiohjelma Harrastukselle.
      * @param args ei käytössä

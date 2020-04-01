@@ -1,5 +1,8 @@
 package tietorakenne;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 /**
  * Tietorakenteen luokka Finaalit, joka osaa mm. lisätä uuden finaalin tietokantaan.
  *
@@ -11,7 +14,7 @@ public class Finaalit {
     private int              lkm           = 0;
     private String           tiedostonNimi = "";
     private Finaali          alkiot[]      = new Finaali[MAX_JASENIA];
-
+   
 
     /**
      * Oletusmuodostaja
@@ -43,6 +46,20 @@ public class Finaalit {
         if (i < 0 || lkm <= i)
             throw new IndexOutOfBoundsException("Laiton indeksi: " + i);
         return alkiot[i];
+    }
+    
+    /**
+     * Etsitään hakuehtoon vastaavat kohteet listchooserista
+     * @param hakuehto hakuehto
+     * @return lista löytyneistä
+     */
+    @SuppressWarnings("unused")
+    public Collection<Finaali> etsi(String hakuehto) { 
+        Collection<Finaali> loytyneet = new ArrayList<Finaali>(); 
+        for (Finaali finaali : this) { 
+            loytyneet.add(finaali);  
+        } 
+        return loytyneet; 
     }
 
 

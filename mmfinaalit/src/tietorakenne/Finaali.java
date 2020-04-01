@@ -3,6 +3,8 @@ package tietorakenne;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
+import fi.jyu.mit.ohj2.Mjonot;
+
 ///import javafx.beans.property.SimpleStringProperty;
 
 /**
@@ -94,10 +96,83 @@ public class Finaali {
 	    public int getTunnusNro() {
 	        return tunnusNro;
 	    }
+	    
+	    /**
+	     * Asettaa tunnusnumeron ja samalla varmistaa että
+	     * seuraava numero on aina suurempi kuin tähän mennessä suurin.
+	     * @param nr asetettava tunnusnumero
+	     */
+	    private void setTunnusNro(int nr) {
+	        tunnusNro = nr;
+	        if (tunnusNro >= seuraavaNro) seuraavaNro = tunnusNro + 1;
+	    }
+	    
+
+	    /**
+	     * Palauttaa jäsenen tiedot merkkijonona jonka voi tallentaa tiedostoon.
+	     * @return jäsen tolppaeroteltuna merkkijonona 
+	     * @example
+	     * <pre name="test">
+	     *   Jasen jasen = new Jasen();
+	     *   jasen.parse("   3  |  Ankka Aku   | 030201-111C");
+	     *   jasen.toString().startsWith("3|Ankka Aku|030201-111C|") === true; // on enemmäkin kuin 3 kenttää, siksi loppu |
+	     * </pre>  
+	     */
+	    @Override
+	    public String toString() {
+	        return "" +
+	                getTunnusNro() + "|" +
+	                vuosi + "|" +
+	                voittaja + "|" +
+	                hopeajoukkue + "|" +
+	                lopputulos + "|" +
+	                katsojia + "|"; 
+	    }
 
 
 	    /**
-	     * Testiohjelma jäsenelle.
+	     * Selvitää jäsenen tiedot | erotellusta merkkijonosta
+	     * Pitää huolen että seuraavaNro on suurempi kuin tuleva tunnusNro.
+	     * @param rivi josta jäsenen tiedot otetaan
+	     * 
+	     * @example
+	     * <pre name="test">
+	     *   Jasen jasen = new Jasen();
+	     *   jasen.parse("   3  |  Ankka Aku   | 030201-111C");
+	     *   jasen.getTunnusNro() === 3;
+	     *   jasen.toString().startsWith("3|Ankka Aku|030201-111C|") === true; // on enemmäkin kuin 3 kenttää, siksi loppu |
+	     *
+	     *   jasen.rekisteroi();
+	     *   int n = jasen.getTunnusNro();
+	     *   jasen.parse(""+(n+20));       // Otetaan merkkijonosta vain tunnusnumero
+	     *   jasen.rekisteroi();           // ja tarkistetaan että seuraavalla kertaa tulee yhtä isompi
+	     *   jasen.getTunnusNro() === n+20+1;
+	     *     
+	     * </pre>
+	     */
+	    public void parse(String rivi) {
+	        StringBuffer sb = new StringBuffer(rivi);
+	        setTunnusNro(Mjonot.erota(sb, '|', getTunnusNro()));
+	        vuosi = Mjonot.erota(sb, '|', vuosi);
+	        voittaja = Mjonot.erota(sb, '|', voittaja);
+	        hopeajoukkue = Mjonot.erota(sb, '|', hopeajoukkue);
+	        lopputulos = Mjonot.erota(sb, '|', lopputulos);
+	        katsojia = Mjonot.erota(sb, '|', katsojia);
+	    }
+	    
+	    @Override
+	    public boolean equals(Object jasen) {
+	        if ( jasen == null ) return false;
+	        return this.toString().equals(jasen.toString());
+	    }
+
+	    @Override
+	    public int hashCode() {
+	        return tunnusNro;
+	    }
+
+	    /**
+	     * Testiohjelma finaalille..
 	     * @param args ei käytössä
 	     */
 	    public static void main(String args[]) {
@@ -115,139 +190,4 @@ public class Finaali {
 	        finaali2.testiFinaali();
 	        finaali2.tulosta(System.out);
 	    }
-
-
-	
-	
-	
-	
-	/**
-	private SimpleStringProperty vuosi, paikka, voittaja, hopeajoukkue, lopputulos, katsojat;
-
-    public Finaali(String vuosi, String paikka, String voittaja, String hopeajoukkue, String lopputulos, String katsojat) {
-        
-    	this.vuosi = new SimpleStringProperty(vuosi);
-        this.paikka = new SimpleStringProperty(paikka);
-        this.voittaja = new SimpleStringProperty(voittaja);
-        this.hopeajoukkue = new SimpleStringProperty(hopeajoukkue);
-        this.lopputulos = new SimpleStringProperty(lopputulos);
-        this.katsojat = new SimpleStringProperty(katsojat);
-    }
-    */
-    
-    
-    /**
-	 * @return the vuosi
-	
-	public String getVuosi() {
-		return vuosi.get();
-	}
-
-
-
-	/**
-	 * @param vuosi the vuosi to set
-	 
-	public void setVuosi(SimpleStringProperty vuosi) {
-		this.vuosi = vuosi;
-	}
-
-
-
-	/**
-	 * @return the paikka
-	 
-	public String getPaikka() {
-		return paikka.get();
-	}
-
-
-
-	/**
-	 * @param paikka the paikka to set
-	 
-	public void setPaikka(SimpleStringProperty paikka) {
-		this.paikka = paikka;
-	}
-
-
-
-	/**
-	 * @return the voittaja
-	 
-	public String getVoittaja() {
-		return voittaja.get();
-	}
-
-
-
-	/**
-	 * @param voittaja the voittaja to set
-	 
-	public void setVoittaja(SimpleStringProperty voittaja) {
-		this.voittaja = voittaja;
-	}
-
-
-
-	/**
-	 * @return the hopeajoukkue
-	 
-	public String getHopeajoukkue() {
-		return hopeajoukkue.get();
-	}
-
-
-
-	/**
-	 * @param hopeajoukkue the hopeajoukkue to set
-	
-	public void setHopeajoukkue(SimpleStringProperty hopeajoukkue) {
-		this.hopeajoukkue = hopeajoukkue;
-	}
-
-
-
-	/**
-	 * @return the lopputulos
-	
-	public String getLopputulos() {
-		return lopputulos.get();
-	}
-
-
-
-	/**
-	 * @param lopputulos the lopputulos to set
-	 
-	public void setLopputulos(SimpleStringProperty lopputulos) {
-		this.lopputulos = lopputulos;
-	}
-
-
-
-	/**
-	 * @return the katsojat
-	 
-	public String getKatsojat() {
-		return katsojat.get();
-	}
-
-
-
-	/**
-	 * @param katsojat the katsojat to set
-	
-	public void setKatsojat(SimpleStringProperty katsojat) {
-		this.katsojat = katsojat;
-	}
-
-
-
-	public String toString()
-    {
-        return String.format("%s %s", vuosi, paikka, voittaja, hopeajoukkue, lopputulos, katsojat);
-    }
-    */
-
 }
