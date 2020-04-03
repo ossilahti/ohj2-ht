@@ -24,9 +24,9 @@ public class MMFinaalitMain extends Application {
             
             // Platform.setImplicitExit(false); // tätä ei kai saa laittaa
 
-            // primaryStage.setOnCloseRequest((event) -> {
-            //     if ( !tietokantaCtrl.voikoSulkea() ) event.consume();
-            //  });
+            primaryStage.setOnCloseRequest((event) -> {
+                 if ( !tietokantaCtrl.voikoSulkea() ) event.consume();
+            });
         
             Tietokanta tietokanta = new Tietokanta();  
             tietokantaCtrl.setTietokanta(tietokanta); 
@@ -36,8 +36,8 @@ public class MMFinaalitMain extends Application {
             Application.Parameters params = getParameters(); 
             if ( params.getRaw().size() > 0 ) 
             	tietokantaCtrl.lueTiedosto(params.getRaw().get(0));  
-
-        
+            else 
+            	if (!tietokantaCtrl.avaa()) Platform.exit();
 
         } catch(Exception e) {
             e.printStackTrace();
@@ -51,27 +51,4 @@ public class MMFinaalitMain extends Application {
 	public static void main(String[] args) {
 		launch(args);
 	}
-
-	
-	
-	//public void start(Stage primaryStage) {
-		//try {
-			//BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("MMFinaalitGUIView.fxml"));
-			//Scene scene = new Scene(root,600,400);
-			//scene.getStylesheets().add(getClass().getResource("mmfinaalit.css").toExternalForm());
-
-            
-
-			/**
-			primaryStage.setScene(scene);
-			primaryStage.setTitle("MM-Finaalit");
-			primaryStage.show();
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public static void main(String[] args) {
-		launch(args);
-	}*/
 }

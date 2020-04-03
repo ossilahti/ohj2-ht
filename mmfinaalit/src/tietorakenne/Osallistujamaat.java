@@ -167,7 +167,7 @@ public class Osallistujamaat implements Iterable<Osallistujamaa> {
      */
     public List<Osallistujamaa> annaOsallistujamaat(int finaalinTunnusNro) {
         List<Osallistujamaa> loydetyt = new ArrayList<Osallistujamaa>();
-        for (Osallistujamaa maa : alkiot)
+        for (Osallistujamaa maa : this)
             if (maa.getFinaaliNro() == finaalinTunnusNro) loydetyt.add(maa);
         return loydetyt;
     }

@@ -48,16 +48,6 @@ public class MMFinaalitGUIController implements Initializable {
   	@FXML private ScrollPane panelFinaali;
   	@FXML private TableView<Finaali> tableView;
     
-    /**
-	 * Alustetaan finaalitaulukon sarakkeet
-	 */
-	
-    @FXML private TableColumn<Finaali,String> vuosiColumn;
-    @FXML private TableColumn<Finaali,String> paikkaColumn;
-    @FXML private TableColumn<Finaali,String> voittajaColumn;
-    @FXML private TableColumn<Finaali,String> hopeajoukkueColumn;
-    @FXML private TableColumn<Finaali,String> lopputulosColumn;
-    @FXML private TableColumn<Finaali,String> katsojatColumn;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -77,6 +67,14 @@ public class MMFinaalitGUIController implements Initializable {
 	
 	@FXML private void handleHelpWindow() {
 	    helpWindow();
+	}
+	
+	/**
+	 * Tallentaa napista tiedot.
+	 */
+	
+	@FXML private void handleTallenna() {
+		tallenna();
 	}
 
 	/**
@@ -120,7 +118,6 @@ public class MMFinaalitGUIController implements Initializable {
 		 if ( finaaliKohdalla != null )
 			 hae(finaaliKohdalla.getTunnusNro()); 
 		
-		//Dialogs.showMessageDialog("Hakuehdon käsittely on vielä kesken!");
     }
 
 	 @FXML private void handleTulosta() throws SailoException {
@@ -156,8 +153,28 @@ public class MMFinaalitGUIController implements Initializable {
         
         chooserFinaalit.addSelectionListener(e -> naytaFinaali());
     }
-        
-        
+    
+	/**
+	 * Tarkistetaan onko tallennus tehty     
+	 * @return true jos saa sulkea, false jos ei
+	 */
+    public boolean voikoSulkea() {
+        tallenna();
+        return true;
+    }
+    
+    /**
+     * Kysytään tiedoston nimi ja luetaan se
+     * @return true jos onnistui, false jos ei
+     */
+    public boolean avaa() {
+        String uusinimi = StartingWindowController.kysyNimi(null, finaalinNimi);
+        if (uusinimi == null) return false;
+        lueTiedosto(uusinimi);
+        return true;
+    }
+
+
     /**
      * Näyttää listasta valitun finaalin tiedot, tilapäisesti yhteen isoon edit-kenttään
      */
@@ -172,7 +189,9 @@ public class MMFinaalitGUIController implements Initializable {
         areaFinaali.setText("");
         try (PrintStream os = TextAreaOutputStream.getTextPrintStream(areaFinaali)) {
             tulosta(os,finaaliKohdalla);  
-        }
+        } catch (SailoException e) {
+			e.printStackTrace();
+		}
     }
 
     private void poistaFinaali() {
@@ -231,7 +250,6 @@ public class MMFinaalitGUIController implements Initializable {
 
     /**
      * Hakee finaalien tiedot listaan
-     * TODO: ???????????? TÄSSÄ VIKA
      * @param fnro finaalin numero, joka aktivoidaan haun jälkeen
      */
     protected void hae(int fnro) {
@@ -329,8 +347,9 @@ public class MMFinaalitGUIController implements Initializable {
        * Tulostaa finaalin tiedot
        * @param os tietovirta johon tulostetaan
        * @param finaali tulostettava finaali
+       * @throws SailoException 
        */
-      public void tulosta(PrintStream os, final Finaali finaali) {
+      public void tulosta(PrintStream os, final Finaali finaali) throws SailoException {
           os.println("----------------------------------------------");
           finaali.tulosta(os);
           os.println("----------------------------------------------");
@@ -345,11 +364,11 @@ public class MMFinaalitGUIController implements Initializable {
       /**
        * Tulostaa listassa olevat finaalit tekstialueeseen
        * @param text alue johon tulostetaan
-     * @throws SailoException 
+       * @throws SailoException 
        */
       public void tulostaValitut(TextArea text) throws SailoException {
           try (PrintStream os = TextAreaOutputStream.getTextPrintStream(text)) {
-              os.println("Tulostetaan kaikki jäsenet");
+              os.println("Tulostetaan kaikki finaalit: ");
               Collection<Finaali> finaalit = tietokanta.etsi(""); 
               for(Finaali fin: finaalit) {
                   tulosta(os, fin);

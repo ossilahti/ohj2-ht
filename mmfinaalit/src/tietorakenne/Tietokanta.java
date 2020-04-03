@@ -1,5 +1,6 @@
 package tietorakenne;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
@@ -12,17 +13,9 @@ import java.util.List;
  * @version 11.3.2020 | Lisäsin osallistujamaaluokat
  */
 public class Tietokanta {
-    private final Finaalit finaalit = new Finaalit();
-    private final Osallistujamaat osallistujamaat = new Osallistujamaat(); 
+    private Finaalit finaalit = new Finaalit();
+    private Osallistujamaat osallistujamaat = new Osallistujamaat(); 
 
-
-    /**
-     * Palautaa finaalien lukumäärän
-     * @return finaalien määrä
-     */
-    public int getFinaalit() {
-        return finaalit.getLkm();
-    }
 
 
     /**
@@ -58,7 +51,7 @@ public class Tietokanta {
      * @param finaali finaali jolle osallistujamaita etsitään
      * @return tietorakenne jossa viiteet löydettyihin osallistujamaihin
      */
-    public List<Osallistujamaa> annaOsallistujamaat(Finaali finaali) {
+    public List<Osallistujamaa> annaOsallistujamaat(Finaali finaali) throws SailoException  {
         return osallistujamaat.annaOsallistujamaat(finaali.getTunnusNro());
     }
 
@@ -72,6 +65,19 @@ public class Tietokanta {
     public Finaali annaFinaali(int i) throws IndexOutOfBoundsException {
         return finaalit.anna(i);
     }
+    
+    /**
+     * Asettaa tiedostojen perusnimet
+     * @param nimi uusi nimi
+     */
+    public void setTiedosto(String nimi) {
+        File dir = new File(nimi);
+        dir.mkdirs();
+        String hakemistonNimi = "";
+        if ( !nimi.isEmpty() ) hakemistonNimi = nimi +"/";
+        finaalit.setTiedostonPerusNimi(hakemistonNimi + "listammfinaaleista");
+        osallistujamaat.setTiedostonPerusNimi(hakemistonNimi + "osallistujamaat");
+    }
 
 
     /**
@@ -80,8 +86,12 @@ public class Tietokanta {
      * @throws SailoException jos lukeminen epäonnistuu
      */
     public void lueTiedostosta(String nimi) throws SailoException {
-        finaalit.lueTiedostosta(nimi);
-        osallistujamaat.lueTiedostosta(nimi);
+    	 finaalit = new Finaalit(); // jos luetaan olemassa olevaan niin helpoin tyhjentää näin
+         osallistujamaat = new Osallistujamaat();
+
+         setTiedosto(nimi);
+         finaalit.lueTiedostosta();
+         osallistujamaat.lueTiedostosta();
     }
 
 
@@ -90,8 +100,20 @@ public class Tietokanta {
      * @throws SailoException jos tallettamisessa ongelmia
      */
     public void talleta() throws SailoException {
-        finaalit.talleta();
-        osallistujamaat.talleta();
+    	String virhe = "";
+        try {
+            finaalit.tallenna();
+        } catch ( SailoException ex ) {
+            virhe = ex.getMessage();
+        }
+
+        try {
+            osallistujamaat.talleta();
+        } catch ( SailoException ex ) {
+            virhe += ex.getMessage();
+        }
+        if ( !"".equals(virhe) ) throw new SailoException(virhe);
+
     }
     
     public Collection<Finaali> etsi(String hakuehto) throws SailoException { 
@@ -107,7 +129,7 @@ public class Tietokanta {
         Tietokanta tietokanta = new Tietokanta();
 
         try {
-            // kerho.lueTiedostosta("kelmit");
+            //tietokanta.lueTiedostosta("tiedostot");
 
             Finaali finaali1 = new Finaali(); finaali1.rekisteroi(); finaali1.testiFinaali(); tietokanta.lisaa(finaali1);
             Finaali finaali2 = new Finaali(); finaali2.rekisteroi(); finaali2.testiFinaali(); tietokanta.lisaa(finaali2);
@@ -121,14 +143,15 @@ public class Tietokanta {
 
             System.out.println("============= Tietokannan testi =================");
 
-            for (int i = 0; i < tietokanta.getFinaalit(); i++) {
-                Finaali finaali = tietokanta.annaFinaali(i);
+            Collection<Finaali> finaalit = tietokanta.etsi("");
+            int i = 0;
+            for (Finaali finaali: finaalit) {
                 System.out.println("Finaali paikassa: " + i);
                 finaali.tulosta(System.out);
                 List<Osallistujamaa> loytyneet = tietokanta.annaOsallistujamaat(finaali);
                 for (Osallistujamaa maa : loytyneet)
                 maa.tulosta(System.out);
-
+                i++;
             }
 
         } catch (SailoException ex) {

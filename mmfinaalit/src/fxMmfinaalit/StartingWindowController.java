@@ -1,33 +1,65 @@
 package fxMmfinaalit;
 
-import java.io.IOException;
-
-import javafx.event.ActionEvent;
+import fi.jyu.mit.fxgui.ModalController;
+import fi.jyu.mit.fxgui.ModalControllerInterface;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+/**
+ * Kystään finaalin nimi ja luodaan tätä varten dialogi.
+ * 
+ * @author Ossi L
+ * @version 2.4.2020
+ */
+public class StartingWindowController implements ModalControllerInterface<String> {
+    
+    @FXML private TextField textVastaus;
+    private String vastaus = null;
 
-public class StartingWindowController {
+    
+    @FXML private void handleOK() {
+        vastaus = textVastaus.getText();
+        ModalController.closeStage(textVastaus);
+    }
+
+    
+    @FXML private void handleCancel() {
+        ModalController.closeStage(textVastaus);
+    }
 
 
-	    /**
-         * Kun tätä metodia kutsutaan, ikkuna vaihtuu MMFINAALITGUIVIEW.FXML:ään.
-         */
-        @FXML private void handleVaihdaIkkunaa(ActionEvent event) throws IOException
-        {
-            Parent paaikkuna = FXMLLoader.load(getClass().getResource("MMFinaalitGUIView.fxml"));
-            Scene paaikkunaScene = new Scene(paaikkuna,600,400);
-            
-            Stage window = (Stage)((Node)event.getSource()).getScene().getWindow();
-            
-            window.setScene(paaikkunaScene);
-            window.show();
-        }
+    @Override
+    public String getResult() {
+        return vastaus;
+    }
 
-	   
+    
+    @Override
+    public void setDefault(String oletus) {
+        textVastaus.setText(oletus);
+    }
+
+    
+    /**
+     * Mitä tehdään kun dialogi on näytetty
+     */
+    @Override
+    public void handleShown() {
+        textVastaus.requestFocus();
+    }
+    
+    
+    /**
+     * Luodaan nimenkysymisdialogi ja palautetaan siihen kirjoitettu nimi tai null
+     * @param modalityStage mille ollaan modaalisia, null = sovellukselle
+     * @param oletus mitä nimeä näytetään oletuksena
+     * @return null jos painetaan Cancel, muuten kirjoitettu nimi
+     */
+    public static String kysyNimi(Stage modalityStage, String oletus) {
+        return ModalController.showModal(
+                StartingWindowController.class.getResource("StartingWindow.fxml"),
+                "MM-Finaalit",
+                modalityStage, oletus);
+    }
 }
-

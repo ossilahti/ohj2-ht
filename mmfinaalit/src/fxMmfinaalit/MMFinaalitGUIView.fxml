@@ -92,6 +92,7 @@
             <Button mnemonicParsing="false" onAction="#handleUusiFinaali" text="Lisää finaali" />
             <Button mnemonicParsing="false" onAction="#handleUusiOsallistujamaa" text="Lisää osallistujamaa" />
             <Button mnemonicParsing="false" onAction="#handleRemoveFinal" text="Poista finaali" />
+            <Button mnemonicParsing="false" onAction="#handleTallenna" text="Tallenna" />
         </buttons>
          <BorderPane.margin>
             <Insets right="7.0" />
