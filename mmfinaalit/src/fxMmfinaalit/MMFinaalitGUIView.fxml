@@ -33,6 +33,7 @@
             <items>
               <MenuItem mnemonicParsing="false" onAction="#handleVaihdaIkkunaaLisaaFinaali" text="Lisää finaali.." />
                   <MenuItem mnemonicParsing="false" onAction="#handleRemoveFinal" text="Poista finaali.." />
+                  <MenuItem mnemonicParsing="false" onAction="#handleMuokkaaFinaalia" text="Muokkaa finaalia.." />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Apua">
@@ -107,44 +108,49 @@
                   <Label text="Finaalin tiedot" BorderPane.alignment="CENTER" />
                </top>
                <center>
-                   <ScrollPane fx:id="panelFinaali" fitToWidth="true" pannable="true" BorderPane.alignment="CENTER">
+                   <ScrollPane fx:id="panelJasen" fitToWidth="true" pannable="true" prefWidth="294.0" BorderPane.alignment="CENTER"> 
                      <content>
-                        <GridPane>
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
+                        <GridPane hgap="10.0">
+                           <columnConstraints>
+                              <ColumnConstraints fillWidth="false" halignment="RIGHT" hgrow="NEVER" minWidth="10.0" />
+                              <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
                            <children>
                               <Label text="Vuosi" />
-                              <Label text="Finaalipaikka" GridPane.rowIndex="1" />
-                              <Label text="Voittajajoukkue" GridPane.rowIndex="2" />
+                              <Label text="Järjestäjä" GridPane.rowIndex="1" />
+                              <Label text="Voittaja" GridPane.rowIndex="2" />
                               <Label text="Hopeajoukkue" GridPane.rowIndex="3" />
                               <Label text="Lopputulos" GridPane.rowIndex="4" />
                               <Label text="Katsojia" GridPane.rowIndex="5" />
-                              <TextField text="2018" GridPane.columnIndex="1" />
-                              <TextField text="Venäjä" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <TextField text="Ranska" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                              <TextField text="Kroatia" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                              <TextField text="4-2" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                              <TextField text="75000" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+			                  <TextField fx:id="editVuosi" editable="false" text="2018" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+			                  <TextField fx:id="editJarjestaja" editable="false" text="Venäjä" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+			                  <TextField fx:id="editVoittaja" editable="false" text="Ranska" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" />
+			                  <TextField fx:id="editHopeajoukkue" editable="false" text="Kroatia" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" />
+                              <TextField editable="false" text="4-2" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" />
+                              <TextField editable="false" text="75000" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5" />
                            </children>
+                           <opaqueInsets>
+                              <Insets left="10.0" top="10.0" />
+                           </opaqueInsets>
                            <padding>
-                              <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                              <Insets left="10.0" right="10.0" top="10.0" />
                            </padding>
                         </GridPane>
-                     </content></ScrollPane>
+                     </content>
+                  </ScrollPane>
                </center>
                <bottom>
                   <Label fx:id="labelVirhe" alignment="CENTER" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER" />
                </bottom>
+
             </BorderPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
@@ -154,8 +160,8 @@
                         <Label text="Osallistujamaita" BorderPane.alignment="CENTER" />
                      </top>
                      <center>
-                  <StringGrid editable="true" rivit="Maan ID| Maa&#10;1| Brasilia&#10;2| Saksa&#10;3| Italia" BorderPane.alignment="CENTER" />
-               		</center>   
+                 		 <StringGrid fx:id="gridOsallistujamaat" editable="true" rivit="Maan ID| Maa&#10;1| Brasilia&#10;2| Saksa&#10;3| Italia" BorderPane.alignment="CENTER" />
+               		 </center>   
                	</BorderPane>
                </children></AnchorPane>
         </items>

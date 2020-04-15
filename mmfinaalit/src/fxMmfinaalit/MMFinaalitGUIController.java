@@ -13,6 +13,7 @@ import java.util.ResourceBundle;
 import fi.jyu.mit.fxgui.Dialogs;
 import fi.jyu.mit.fxgui.ListChooser;
 import fi.jyu.mit.fxgui.ModalController;
+import fi.jyu.mit.fxgui.StringGrid;
 import fi.jyu.mit.fxgui.TextAreaOutputStream;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -22,12 +23,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import tietorakenne.Finaali;
 import tietorakenne.Osallistujamaa;
@@ -46,7 +44,11 @@ public class MMFinaalitGUIController implements Initializable {
   	@FXML private TextField searchCriteria;
   	@FXML private TextInputControl searchField;
   	@FXML private ScrollPane panelFinaali;
-  	@FXML private TableView<Finaali> tableView;
+  	@FXML private StringGrid<Osallistujamaa> gridOsallistujamaat;
+  	@FXML private TextField editVuosi;
+    @FXML private TextField editJarjestaja;
+    @FXML private TextField editVoittaja;
+    @FXML private TextField editHopeajoukkue;    
     
     
     @Override
@@ -75,6 +77,10 @@ public class MMFinaalitGUIController implements Initializable {
 	
 	@FXML private void handleTallenna() {
 		tallenna();
+	}
+
+	@FXML private void handleMuokkaaFinaalia() {
+        muokkaa();
 	}
 
 	/**
@@ -138,8 +144,7 @@ public class MMFinaalitGUIController implements Initializable {
 	private String finaalinNimi = "mmfinaalit";
 	private Tietokanta tietokanta;
     private Finaali finaaliKohdalla;
-    private TextArea areaFinaali = new TextArea();
-    
+    private TextField edits[]; 
     
     /**
      * Tekee tarvittavat muut alustukset, nyt vaihdetaan TableViewn tilalle
@@ -147,12 +152,11 @@ public class MMFinaalitGUIController implements Initializable {
      * Alustetaan myös jäsenlistan kuuntelija 
      */
     private void alusta() {
-        panelFinaali.setContent(areaFinaali);
-        areaFinaali.setFont(new Font("Courier New", 12));
-        panelFinaali.setFitToHeight(true);
-        
-        chooserFinaalit.addSelectionListener(e -> naytaFinaali());
+        chooserFinaalit.clear();
+    	chooserFinaalit.addSelectionListener(e -> naytaFinaali());
+    	edits = new TextField[]{editVuosi, editJarjestaja, editVoittaja, editHopeajoukkue}; 
     }
+    
     
 	/**
 	 * Tarkistetaan onko tallennus tehty     
@@ -180,23 +184,49 @@ public class MMFinaalitGUIController implements Initializable {
      */
     private void naytaFinaali() {
         finaaliKohdalla = chooserFinaalit.getSelectedObject();
-
-        if (finaaliKohdalla == null) {
-        	areaFinaali.clear();
-        	return;
-        }
-
-        areaFinaali.setText("");
-        try (PrintStream os = TextAreaOutputStream.getTextPrintStream(areaFinaali)) {
-            tulosta(os,finaaliKohdalla);  
+        if (finaaliKohdalla == null) return;
+        
+        FinaaliDialogController.naytaFinaali(edits, finaaliKohdalla); 
+        naytaOsallistujamaat(finaaliKohdalla);    
+    }
+    
+    /**
+     * Näytetään osallistujamaan tiedot StringGridissä
+     * @param finaali
+     */
+    private void naytaOsallistujamaat(Finaali finaali) {
+        gridOsallistujamaat.clear();
+        if ( finaali == null ) return;
+        
+        try {
+            List<Osallistujamaa> maat = tietokanta.annaOsallistujamaat(finaali);
+            if ( maat.size() == 0 ) return;
+            for (Osallistujamaa maa: maat)
+                naytaOsallistujamaa(maa);
         } catch (SailoException e) {
-			e.printStackTrace();
-		}
+            // naytaVirhe(e.getMessage());
+        } 
     }
 
+    
+    private void naytaOsallistujamaa(Osallistujamaa maa) {
+        String[] rivi = maa.toString().split("\\|"); // TODO: huono ja tilapäinen ratkaisu
+        gridOsallistujamaat.add(maa,rivi[1], rivi[2]);
+    }
+
+    /**
+     * Finaalin poisto
+     */
     private void poistaFinaali() {
 		Dialogs.showMessageDialog("Ei osata vielä poistaa!");
 	}
+    
+    /**
+     * Finaalin muokkaus
+     */
+    private void muokkaa() {
+        FinaaliDialogController.kysyFinaali(null, finaaliKohdalla);
+    }
 
     /**
      * Alustaa finaalin lukemalla sen valitun nimisestä tiedostosta

@@ -190,4 +190,19 @@ public class Finaali {
 	        finaali2.testiFinaali();
 	        finaali2.tulosta(System.out);
 	    }
+
+
+		public String getFinaalipaikka() {
+			return finaalipaikka;
+		}
+
+
+		public String getVoittaja() {
+			return voittaja;
+		}
+
+
+		public String getHopeajoukkue() {
+			return hopeajoukkue;
+		}
 }
