@@ -45,6 +45,17 @@ public class Tietokanta {
     public void lisaa(Osallistujamaa maa) {
         osallistujamaat.lisaa(maa);
     }
+    
+    /**
+     * Korvaa finaalin tietorakenteessa.  Ottaa finaalin omistukseensa.
+     * Etsitään samalla tunnusnumerolla oleva finaali.  Jos ei löydy,
+     * niin lisätään uutena finaalina.
+     * @param finaali lisätäävän finaaliin viite.  Huom tietorakenne muuttuu omistajaksi
+     * @throws SailoException jos tietorakenne on jo täynnä
+     */
+    public void korvaaTaiLisaa(Finaali finaali) throws SailoException { 
+        finaalit.korvaaTaiLisaa(finaali); 
+    }
 
     /**
      * Haetaan kaikki finaalin osallistujamaat

@@ -14,7 +14,7 @@ import fi.jyu.mit.ohj2.Mjonot;
  * @version 1.0, 10.3.2020
  */
 
-public class Finaali {
+public class Finaali implements Cloneable {
 
 	private int        tunnusNro;
     private String     vuosi			= "";       
@@ -205,4 +205,69 @@ public class Finaali {
 		public String getHopeajoukkue() {
 			return hopeajoukkue;
 		}
+		
+	    /**
+	     * @param s finaalille laitettava vuosi
+	     * @return virheilmoitus, null jos ok
+	     */
+	    public String setVuosi(String s) {
+	    	if (s.startsWith("18")) return "Yhtään peliä ei pelattu 1800-luvulla.";
+	    	if (s.startsWith("192")) return "Yhtään peliä ei pelattu ennen 1930-lukua.";
+	    	if (!s.matches("[0-9]*") ) return "Vuoden on oltava numeerisessa muodossa.";
+	    	vuosi = s;
+	        return null;
+	    }
+
+	    /**
+	     * @param s finaalin järjestäjä
+	     * @return virheilmoitus, null jos ok
+	     */
+	    public String setJarjestaja(String s) {
+	    	if ( !s.matches("[^0-9]*") ) return "Järjestäjän nimessä ei voi olla numeroita.";
+	        finaalipaikka = s;
+	        return null;
+	    }
+
+	    
+	    /**
+	     * @param s finaalille laitettava voittaja
+	     * @return virheilmoitus, null jos ok
+	     */
+	    public String setVoittaja(String s) {
+	    	if ( !s.matches("[^0-9]*") ) return "Maan nimessä ei voi olla numeroita.";
+	        voittaja = s;
+	        return null;
+	    }
+
+	    
+	    /**
+	     * @param s finaalille laitettava hopeajoukkue
+	     * @return virheilmoitus, null jos ok
+	     */
+	    public String setHopeajoukkue(String s) {
+	        if ( !s.matches("[^0-9]*") ) return "Maan nimessä ei voi olla numeroita.";
+	        hopeajoukkue = s;
+	        return null;
+	    }
+	    
+	    /**
+	     * Tehdään identtinen klooni jäsenestä
+	     * @return Object kloonattu jäsen
+	     * @example
+	     * <pre name="test">
+	     * #THROWS CloneNotSupportedException 
+	     *   Jasen jasen = new Jasen();
+	     *   jasen.parse("   3  |  Ankka Aku   | 123");
+	     *   Jasen kopio = jasen.clone();
+	     *   kopio.toString() === jasen.toString();
+	     *   jasen.parse("   4  |  Ankka Tupu   | 123");
+	     *   kopio.toString().equals(jasen.toString()) === false;
+	     * </pre>
+	     */
+	    @Override
+	    public Finaali clone() throws CloneNotSupportedException {
+	        Finaali uusi;
+	        uusi = (Finaali) super.clone();
+	        return uusi;
+	    }
 }

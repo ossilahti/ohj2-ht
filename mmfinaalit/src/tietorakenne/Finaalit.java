@@ -61,6 +61,25 @@ public class Finaalit implements Iterable<Finaali> {
         return alkiot[i];
     }
     
+    /**
+     * Korvaa finaalin tietorakenteessa.  Ottaa finaalin omistukseensa.
+     * Etsitään samalla tunnusnumerolla oleva finaali.  Jos ei löydy,
+     * niin lisätään uutena finaalina.
+     * @param finaali lisätäävän finaaliin viite.  Huom tietorakenne muuttuu omistajaksi
+     * @throws SailoException jos tietorakenne on jo täynnä
+     */
+    public void korvaaTaiLisaa(Finaali finaali) throws SailoException {
+        int id = finaali.getTunnusNro();
+        for (int i = 0; i < lkm; i++) {
+            if ( alkiot[i].getTunnusNro() == id ) {
+                alkiot[i] = finaali;
+                muutettu = true;
+                return;
+            }
+        }
+        lisaa(finaali);
+    }
+    
     public class FinaalitIterator implements Iterator<Finaali> {
         private int kohdalla = 0;
 
@@ -254,7 +273,7 @@ public class Finaalit implements Iterable<Finaali> {
      * @param args ei käytössä
      */
     public static void main(String args[]) {
-        Finaalit jasenet = new Finaalit();
+        Finaalit finaalitTesti = new Finaalit();
 
         Finaali finaali1 = new Finaali(); 
         Finaali finaali2 = new Finaali();
@@ -264,13 +283,13 @@ public class Finaalit implements Iterable<Finaali> {
         finaali2.testiFinaali();
 
         try {
-            jasenet.lisaa(finaali1);
-            jasenet.lisaa(finaali2);
+            finaalitTesti.lisaa(finaali1);
+            finaalitTesti.lisaa(finaali2);
 
-            System.out.println("============= Jäsenet testi =================");
+            System.out.println("============= Finaalien testi =================");
 
-            for (int i = 0; i < jasenet.getLkm(); i++) {
-                Finaali finaali = jasenet.anna(i);
+            int i = 0;
+            for (Finaali finaali: finaalitTesti) { 
                 System.out.println("Finaali " + i);
                 finaali.tulosta(System.out);
             }

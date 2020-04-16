@@ -3,6 +3,7 @@ package fxMmfinaalit;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import fi.jyu.mit.fxgui.Dialogs;
 import fi.jyu.mit.fxgui.ModalController;
 import fi.jyu.mit.fxgui.ModalControllerInterface;
 import javafx.fxml.FXML;
@@ -32,12 +33,17 @@ public class FinaaliDialogController implements ModalControllerInterface<Finaali
         alusta();  
     }
     
-    @FXML private void handleOK() {
+    @FXML private void handleOK() {    	
+    	if ( finaaliKohdalla != null && finaaliKohdalla.getVuosi().equals("") ) {
+            naytaVirhe("Nimi ei saa olla tyhjä");
+            return;
+    	}
         ModalController.closeStage(labelVirhe);
     }
 
     
     @FXML private void handleCancel() {
+    	finaaliKohdalla = null;
         ModalController.closeStage(labelVirhe);
     }
 
@@ -61,6 +67,11 @@ public class FinaaliDialogController implements ModalControllerInterface<Finaali
      */
     protected void alusta() {
         edits = new TextField[]{editVuosi, editJarjestaja, editVoittaja, editHopeajoukkue};
+        int i = 0;
+        for (TextField edit : edits) {
+            final int k = ++i;
+            edit.setOnKeyReleased( e -> kasitteleMuutosFinaaliin(k, (TextField)(e.getSource())));
+        }
     }
     
     
@@ -83,6 +94,43 @@ public class FinaaliDialogController implements ModalControllerInterface<Finaali
     @Override
     public void handleShown() {
         editVuosi.requestFocus();
+    }
+    
+    private void naytaVirhe(String virhe) {
+        if ( virhe == null || virhe.isEmpty() ) {
+            labelVirhe.setText("");
+            labelVirhe.getStyleClass().removeAll("virhe");
+            return;
+        }
+        labelVirhe.setText(virhe);
+        labelVirhe.getStyleClass().add("virhe");
+    }
+
+    
+    /**
+     * Käsitellään finaaliin tullut muutos
+     * @param edit muuttunut kenttä
+     */
+    private void kasitteleMuutosFinaaliin(int k, TextField edit) {
+        if (finaaliKohdalla == null) return;
+        String s = edit.getText();
+        String virhe = null;
+        switch (k) {
+           case 1 : virhe = finaaliKohdalla.setVuosi(s); break;
+           case 2 : virhe = finaaliKohdalla.setJarjestaja(s); break;
+           case 3 : virhe = finaaliKohdalla.setVoittaja(s); break;
+           case 4 : virhe = finaaliKohdalla.setHopeajoukkue(s); break;
+           default:
+        }
+        if (virhe == null) {
+            Dialogs.setToolTipText(edit,"");
+            edit.getStyleClass().removeAll("virhe");
+            naytaVirhe(virhe);
+        } else {
+            Dialogs.setToolTipText(edit,virhe);
+            edit.getStyleClass().add("virhe");
+            naytaVirhe(virhe);
+        }
     }
     
     

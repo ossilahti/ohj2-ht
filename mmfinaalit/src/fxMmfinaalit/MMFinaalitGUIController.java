@@ -225,7 +225,18 @@ public class MMFinaalitGUIController implements Initializable {
      * Finaalin muokkaus
      */
     private void muokkaa() {
-        FinaaliDialogController.kysyFinaali(null, finaaliKohdalla);
+    	if ( finaaliKohdalla == null ) return; 
+        try { 
+            Finaali finaali; 
+            finaali = FinaaliDialogController.kysyFinaali(null, finaaliKohdalla.clone()); 
+            if ( finaali == null ) return; 
+            tietokanta.korvaaTaiLisaa(finaali); 
+            hae(finaali.getTunnusNro()); 
+        } catch (CloneNotSupportedException e) { 
+            // 
+        } catch (SailoException e) { 
+            Dialogs.showMessageDialog(e.getMessage()); 
+        }
     }
 
     /**
@@ -311,16 +322,17 @@ public class MMFinaalitGUIController implements Initializable {
      * Luo uuden finaalin jota aletaan editoimaan 
      */
     private void uusiFinaali() {
-        Finaali uusifinaali = new Finaali();
-        uusifinaali.rekisteroi();
-        uusifinaali.testiFinaali();
         try {
+        	Finaali uusifinaali = new Finaali();
+            uusifinaali = FinaaliDialogController.kysyFinaali(null, uusifinaali);  
+            if ( uusifinaali == null ) return;
+            uusifinaali.rekisteroi();
             tietokanta.lisaa(uusifinaali);
+            hae(uusifinaali.getTunnusNro());
         } catch (SailoException e) {
             Dialogs.showMessageDialog("Ongelmia uuden luomisessa " + e.getMessage());
             return;
         }
-        hae(uusifinaali.getTunnusNro());
     }
     
     
