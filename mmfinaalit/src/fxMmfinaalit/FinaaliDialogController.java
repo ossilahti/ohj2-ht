@@ -6,10 +6,14 @@ import java.util.ResourceBundle;
 import fi.jyu.mit.fxgui.Dialogs;
 import fi.jyu.mit.fxgui.ModalController;
 import fi.jyu.mit.fxgui.ModalControllerInterface;
+import fi.jyu.mit.ohj2.Mjonot;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import tietorakenne.Finaali;
 
@@ -22,10 +26,8 @@ import tietorakenne.Finaali;
  */
 public class FinaaliDialogController implements ModalControllerInterface<Finaali>,Initializable  {
 
-    @FXML private TextField editVuosi;
-    @FXML private TextField editJarjestaja;
-    @FXML private TextField editVoittaja;
-    @FXML private TextField editHopeajoukkue;    
+    @FXML private ScrollPane panelFinaali;
+    @FXML private GridPane gridFinaali;
     @FXML private Label labelVirhe;
 
     @Override
@@ -49,16 +51,51 @@ public class FinaaliDialogController implements ModalControllerInterface<Finaali
 
 // ========================================================    
     private Finaali finaaliKohdalla;
-    private TextField edits[];
-   
+    private static Finaali apufinaali = new Finaali(); // Finaali, jolta voi kysyä tietoja..
+    private TextField[] edits;
+    private int kentta = 0;
+    
+    /**
+     * Luodaan GridPaneen jäsenen tiedot
+     * @param gridFinaali mihin tiedot luodaan
+     * @return luodut tekstikentät
+     */
+    public static TextField[] luoKentat(GridPane gridFinaali) {
+        gridFinaali.getChildren().clear();
+        TextField[] edits = new TextField[apufinaali.getKenttia()];
+        
+        for (int i=0, k = apufinaali.ekaKentta(); k < apufinaali.getKenttia(); k++, i++) {
+            Label label = new Label(apufinaali.getKysymys(k));
+            gridFinaali.add(label, 0, i);
+            TextField edit = new TextField();
+            edits[k] = edit;
+            edit.setId("e"+k);
+            gridFinaali.add(edit, 1, i);
+        }
+        return edits;
+    }
+    
+    
+    /**
+     * Palautetaan komponentin id:stä saatava luku
+     * @param obj tutkittava komponentti
+     * @param oletus mikä arvo jos id ei ole kunnollinen
+     * @return komponentin id lukuna 
+     */
+    public static int getFieldId(Object obj, int oletus) {
+        if ( !( obj instanceof Node)) return oletus;
+        Node node = (Node)obj;
+        return Mjonot.erotaInt(node.getId().substring(1),oletus);
+    }
+    
 
     /**
      * Tyhjentään tekstikentät 
-     * @param edits tauluko jossa tyhjennettäviä tektsikenttiä
+     * @param edits tyhjennettävät kentät
      */
     public static void tyhjenna(TextField[] edits) {
         for (TextField edit : edits)
-            edit.setText("");
+        	if ( edit != null ) edit.setText(""); 
     }
 
 
@@ -66,13 +103,18 @@ public class FinaaliDialogController implements ModalControllerInterface<Finaali
      * Tekee tarvittavat muut alustukset.
      */
     protected void alusta() {
-        edits = new TextField[]{editVuosi, editJarjestaja, editVoittaja, editHopeajoukkue};
-        int i = 0;
-        for (TextField edit : edits) {
-            final int k = ++i;
-            edit.setOnKeyReleased( e -> kasitteleMuutosFinaaliin(k, (TextField)(e.getSource())));
-        }
+    	 edits = luoKentat(gridFinaali);
+         for (TextField edit : edits)
+             if ( edit != null )
+                 edit.setOnKeyReleased( e -> kasitteleMuutosFinaaliin((TextField)(e.getSource())));
+         panelFinaali.setFitToHeight(true);
     }
+    
+    
+    private void setKentta(int kentta) {
+        this.kentta = kentta;
+    }
+
     
     
     @Override
@@ -93,7 +135,8 @@ public class FinaaliDialogController implements ModalControllerInterface<Finaali
      */
     @Override
     public void handleShown() {
-        editVuosi.requestFocus();
+    	 kentta = Math.max(apufinaali.ekaKentta(), Math.min(kentta, apufinaali.getKenttia()-1));
+    	 edits[kentta].requestFocus();
     }
     
     private void naytaVirhe(String virhe) {
@@ -111,17 +154,13 @@ public class FinaaliDialogController implements ModalControllerInterface<Finaali
      * Käsitellään finaaliin tullut muutos
      * @param edit muuttunut kenttä
      */
-    private void kasitteleMuutosFinaaliin(int k, TextField edit) {
+    private void kasitteleMuutosFinaaliin(TextField edit) {
         if (finaaliKohdalla == null) return;
+        int k = getFieldId(edit,apufinaali.ekaKentta());
         String s = edit.getText();
         String virhe = null;
-        switch (k) {
-           case 1 : virhe = finaaliKohdalla.setVuosi(s); break;
-           case 2 : virhe = finaaliKohdalla.setJarjestaja(s); break;
-           case 3 : virhe = finaaliKohdalla.setVoittaja(s); break;
-           case 4 : virhe = finaaliKohdalla.setHopeajoukkue(s); break;
-           default:
-        }
+        virhe = finaaliKohdalla.aseta(k,s); 
+       
         if (virhe == null) {
             Dialogs.setToolTipText(edit,"");
             edit.getStyleClass().removeAll("virhe");
@@ -141,10 +180,9 @@ public class FinaaliDialogController implements ModalControllerInterface<Finaali
      */
     public static void naytaFinaali(TextField[] edits, Finaali finaali) {
         if (finaali == null) return;
-        edits[0].setText(finaali.getVuosi());
-        edits[1].setText(finaali.getFinaalipaikka());
-        edits[2].setText(finaali.getVoittaja());
-        edits[3].setText(finaali.getHopeajoukkue());
+        for (int k = finaali.ekaKentta(); k < finaali.getKenttia(); k++) {
+            edits[k].setText(finaali.anna(k));
+        }
     }
     
     
@@ -155,7 +193,7 @@ public class FinaaliDialogController implements ModalControllerInterface<Finaali
      * @param oletus mitä dataan näytetään oletuksena
      * @return null jos painetaan Cancel, muuten täytetty tietue
      */
-    public static Finaali kysyFinaali(Stage modalityStage, Finaali oletus) {
+    public static Finaali kysyFinaali(Stage modalityStage, Finaali oletus, int kentta) {
         return ModalController.<Finaali, FinaaliDialogController>showModal(
                     FinaaliDialogController.class.getResource("FinaaliDialogView.fxml"),
                     "Muokkaa finaalia", modalityStage, oletus, null);

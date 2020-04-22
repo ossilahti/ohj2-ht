@@ -1,19 +1,18 @@
 package tietorakenne;
 
 import java.io.*;
-
 import fi.jyu.mit.ohj2.Mjonot;
-
+import tietorakenne.Tietue;
 /**
  * Osallistujamaa, joka osaa huolehtia tunnusnrostaan.
  * 
  * @author Ossi Lahti
  * @version 11.3.2020
  */
-public class Osallistujamaa {
+public class Osallistujamaa implements Cloneable, Tietue {
     private int tunnusNro;
     private int finaaliNro;
-    private String osallistujamaa;
+    private String osallistujamaa ="";
 
     private static int seuraavaNro = 1;
 
@@ -109,34 +108,27 @@ public class Osallistujamaa {
      */
     @Override
     public String toString() {
-        return "" + getTunnusNro() + "|" + finaaliNro + "|" + osallistujamaa+ "|";
-    }
+    	StringBuffer sb = new StringBuffer("");
+        String erotin = "";
+        for (int k = 0; k < getKenttia(); k++) {
+            sb.append(erotin);
+            sb.append(anna(k));
+            erotin = "|";
+        }
+        return sb.toString();
+     }
+
 
 
     /**
-     * Selvitää harrastuksen tiedot | erotellusta merkkijonosta.
+     * Selvitää osallistujamaan tiedot | erotellusta merkkijonosta.
      * Pitää huolen että seuraavaNro on suurempi kuin tuleva tunnusnro.
      * @param rivi josta harrastuksen tiedot otetaan
-     * @example
-     * <pre name="test">
-     *   Harrastus harrastus = new Harrastus();
-     *   harrastus.parse("   2   |  10  |   Kalastus  | 1949 | 22 t ");
-     *   harrastus.getJasenNro() === 10;
-     *   harrastus.toString()    === "2|10|Kalastus|1949|22";
-     *   
-     *   harrastus.rekisteroi();
-     *   int n = harrastus.getTunnusNro();
-     *   harrastus.parse(""+(n+20));
-     *   harrastus.rekisteroi();
-     *   harrastus.getTunnusNro() === n+20+1;
-     *   harrastus.toString()     === "" + (n+20+1) + "|10|Kalastus|1949|22";
-     * </pre>
      */
     public void parse(String rivi) {
         StringBuffer sb = new StringBuffer(rivi);
-        setTunnusNro(Mjonot.erota(sb, '|', getTunnusNro()));
-        finaaliNro = Mjonot.erota(sb, '|', finaaliNro);
-        osallistujamaa = Mjonot.erota(sb, '|', osallistujamaa);
+        for (int k = 0; k < getKenttia(); k++)
+        	 aseta(k, Mjonot.erota(sb, '|'));
     }
 
 
@@ -151,6 +143,93 @@ public class Osallistujamaa {
     public int hashCode() {
         return tunnusNro;
     }
+    
+    /**
+     * @return osallistujamaan kenttien lukumäärä
+     */
+    @Override
+    public int getKenttia() {
+        return 2;
+    }
+
+
+    /**
+     * @return ensimmäinen käyttäjän syötettävän kentän indeksi
+     */
+    @Override
+    public int ekaKentta() {
+        return 1;
+    }
+    
+
+    /**
+     * @param k minkä kentän kysymys halutaan
+     * @return valitun kentän kysymysteksti
+     */
+    @Override
+    public String getKysymys(int k) {
+        switch (k) {
+            case 0:
+                return "id";
+            case 1:
+            	return "Osallistujamaa";
+            default:
+                return "???";
+        }
+    }
+
+
+    /**
+     * @param k Minkä kentän sisältö halutaan
+     * @return valitun kentän sisältö
+     */
+    @Override
+    public String anna(int k) {
+        switch (k) {
+            case 0:
+                return "" + tunnusNro;
+            case 1:
+                return "" + osallistujamaa;
+            default:
+                return "???";
+        }
+    }
+
+
+    /**
+     * Asetetaan valitun kentän sisältö.  Mikäli asettaminen onnistuu,
+     * palautetaan null, muutoin virheteksti.
+     * @param k minkä kentän sisältö asetetaan
+     * @param s asetettava sisältö merkkijonona
+     * @return null jos ok, muuten virheteksti
+     */
+    @Override
+    public String aseta(int k, String s) {
+        String st = s.trim();
+        StringBuffer sb = new StringBuffer(st);
+        switch (k) {
+            case 0:
+                setTunnusNro(Mjonot.erota(sb, '$', getTunnusNro()));
+                return null;
+            case 1:
+                osallistujamaa = st;
+                return null;
+            default:
+        		return "Väärä kentän indeksi";     
+        }
+    }
+
+
+    /**
+     * Tehdään identtinen klooni finaalista
+     * @return Object kloonattu finaali
+     */
+    @Override
+    public Osallistujamaa clone() throws CloneNotSupportedException { 
+        return (Osallistujamaa)super.clone();
+    }
+    
+
     
     /**
      * Testiohjelma Harrastukselle.

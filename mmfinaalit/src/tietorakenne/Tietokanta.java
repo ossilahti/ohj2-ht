@@ -19,14 +19,24 @@ public class Tietokanta {
 
 
     /**
-     * Poistaa finaaleista, osallistujamaista ja stadioneista ne joilla on nro. Kesken.
-     * @param nro viitenumero, jonka mukaan poistetaan
+     * Poistaa finaalien ja osallistujamaiden tiedot
+     * @param finaali poistettava
      * @return montako finaalia poistettiin
      */
-    public int poista(@SuppressWarnings("unused") int nro) {
-        return 0;
+    public int poista(Finaali finaali) {
+        if ( finaali == null ) return 0;
+        int ret = finaalit.poista(finaali.getTunnusNro()); 
+        osallistujamaat.poistaFinaalinOsallistujat(finaali.getTunnusNro()); 
+        return ret; 
     }
-
+    
+    /** 
+     * Poistaa tämän maan 
+     * @param maa poistettava kohde 
+     */ 
+    public void poistaOsallistujamaa(Osallistujamaa maa) { 
+        osallistujamaat.poista(maa); 
+    }
 
     /**
      * Lisää kerhoon uuden finaalin
@@ -56,6 +66,20 @@ public class Tietokanta {
     public void korvaaTaiLisaa(Finaali finaali) throws SailoException { 
         finaalit.korvaaTaiLisaa(finaali); 
     }
+    
+    
+    /** 
+     * Korvaa osallistujamaan tietorakenteessa.  Ottaa osallistujamaan omistukseensa. 
+     * Etsitään samalla tunnusnumerolla oleva osallistujamaa.  Jos ei löydy, 
+     * niin lisätään uutena osallistujamaana. 
+     * @param maa lisärtävän osallistujamaan viite.  Huom tietorakenne muuttuu omistajaksi 
+     * @throws SailoException jos tietorakenne on jo täynnä 
+     */ 
+    public void korvaaTaiLisaa(Osallistujamaa maa) throws SailoException { 
+        osallistujamaat.korvaaTaiLisaa(maa); 
+    } 
+
+
 
     /**
      * Haetaan kaikki finaalin osallistujamaat
@@ -119,7 +143,7 @@ public class Tietokanta {
         }
 
         try {
-            osallistujamaat.talleta();
+            osallistujamaat.tallenna();
         } catch ( SailoException ex ) {
             virhe += ex.getMessage();
         }
@@ -127,8 +151,8 @@ public class Tietokanta {
 
     }
     
-    public Collection<Finaali> etsi(String hakuehto) throws SailoException { 
-        return finaalit.etsi(hakuehto); 
+    public Collection<Finaali> etsi(String hakuehto, int k) throws SailoException { 
+        return finaalit.etsi(hakuehto, k); 
     } 
 
 
@@ -153,9 +177,8 @@ public class Tietokanta {
 
 
             System.out.println("============= Tietokannan testi =================");
-
-            Collection<Finaali> finaalit = tietokanta.etsi("");
             int i = 0;
+            Collection<Finaali> finaalit = tietokanta.etsi("", i);
             for (Finaali finaali: finaalit) {
                 System.out.println("Finaali paikassa: " + i);
                 finaali.tulosta(System.out);

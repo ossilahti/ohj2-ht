@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fxMmfinaalit.FinaaliDialogController">
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fxMmfinaalit.TietueDialogController">
    <bottom>
       <VBox BorderPane.alignment="CENTER">
          <children>
@@ -21,20 +21,20 @@
             <HBox />
             <ButtonBar prefHeight="40.0" prefWidth="200.0">
               <buttons>
-                <Button defaultButton="true" mnemonicParsing="false" onAction="#handleOK" text="OK" />
+                  <Button defaultButton="true" mnemonicParsing="false" onAction="#handleOK" text="OK" />
                   <Button cancelButton="true" mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
               </buttons>
                <padding>
                   <Insets right="10.0" />
-               </padding> 
+               </padding>
             </ButtonBar>
          </children>
       </VBox>
    </bottom>
    <center>
-      <ScrollPane fx:id="panelFinaali" fitToWidth="true" pannable="true" BorderPane.alignment="CENTER">
+      <ScrollPane fx:id="panelTietue" fitToWidth="true" pannable="true" BorderPane.alignment="CENTER">
          <content>
-            <GridPane fx:id="gridFinaali" hgap="10.0">
+            <GridPane fx:id="gridTietue" hgap="10.0">
                <columnConstraints>
                   <ColumnConstraints fillWidth="false" halignment="RIGHT" hgrow="NEVER" minWidth="10.0" />
                   <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
@@ -53,7 +53,7 @@
                   <Label text="Voittaja" GridPane.rowIndex="2" />
                   <Label text="Hopeajoukkue" GridPane.rowIndex="3" />
                   <Label text="Lopputulos" GridPane.rowIndex="4" />
-                  <Label text="Katsojamäärä" GridPane.rowIndex="5" />
+                  <Label text="Katsojia" GridPane.rowIndex="5" />
                   <TextField text="2018" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
                   <TextField text="Venäjä" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
                   <TextField text="Ranska" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" />

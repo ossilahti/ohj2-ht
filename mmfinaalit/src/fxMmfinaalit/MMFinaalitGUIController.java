@@ -22,15 +22,20 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import tietorakenne.Finaali;
 import tietorakenne.Osallistujamaa;
 import tietorakenne.SailoException;
 import tietorakenne.Tietokanta;
+import static fxMmfinaalit.TietueDialogController.getFieldId; 
 
 /**
  * 
@@ -44,12 +49,8 @@ public class MMFinaalitGUIController implements Initializable {
   	@FXML private TextField searchCriteria;
   	@FXML private TextInputControl searchField;
   	@FXML private ScrollPane panelFinaali;
-  	@FXML private StringGrid<Osallistujamaa> gridOsallistujamaat;
-  	@FXML private TextField editVuosi;
-    @FXML private TextField editJarjestaja;
-    @FXML private TextField editVoittaja;
-    @FXML private TextField editHopeajoukkue;    
-    
+  	@FXML private StringGrid<Osallistujamaa> tableOsallistujamaat;
+  	@FXML private GridPane gridFinaali;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -60,7 +61,7 @@ public class MMFinaalitGUIController implements Initializable {
      * Tietoja ikkunan painallus
      */
 	@FXML private void handleAboutWindow() {
-		Dialogs.showMessageDialog("Tietoikkunan tekeminen on vielä kesken!");
+		ModalController.showModal(MMFinaalitGUIController.class.getResource("AboutWindow.fxml"), "Infoikkuna", null, "");
 	}
 
 	/**
@@ -80,16 +81,9 @@ public class MMFinaalitGUIController implements Initializable {
 	}
 
 	@FXML private void handleMuokkaaFinaalia() {
-        muokkaa();
+		muokkaa(kentta);
 	}
 
-	/**
-	 * Tulosta napin painallus
-	 */
-	
-	@FXML private void handlePrintWindow() {
-		Dialogs.showMessageDialog("Tulostettavaa materiaalia ei vielä ole.");
-	}
 	
 	/**
 	 * Lopeta luokan metodi
@@ -101,14 +95,6 @@ public class MMFinaalitGUIController implements Initializable {
         Platform.exit();
     } 
 	
-    /**
-     * Arvo finaali napin metodi. 
-     */
-    
-	@FXML private void handleRandomize() {
-		Dialogs.showMessageDialog("Arpomista ei vielä pysty tehdä.");
-	}
-	
 	/**
 	 * Poista finaali metodin handleri
 	 */
@@ -116,14 +102,16 @@ public class MMFinaalitGUIController implements Initializable {
 		poistaFinaali();
 	}
 	
+	@FXML private void handleRemoveCountry() {
+		poistaOsallistujamaa();
+	}
+	
 	/**
 	 * Hakuehtoon kun kirjoittaa, mitä tapahtuu:
 	 */
 	
 	@FXML private void handleHakuehto() {
-		 if ( finaaliKohdalla != null )
-			 hae(finaaliKohdalla.getTunnusNro()); 
-		
+		hae(0); 
     }
 
 	 @FXML private void handleTulosta() throws SailoException {
@@ -144,7 +132,11 @@ public class MMFinaalitGUIController implements Initializable {
 	private String finaalinNimi = "mmfinaalit";
 	private Tietokanta tietokanta;
     private Finaali finaaliKohdalla;
-    private TextField edits[]; 
+    private TextField edits[];     
+    private int kentta = 0; 	
+    private static Finaali apufinaali = new Finaali(); 
+    private static Osallistujamaa apuosallistujamaa = new Osallistujamaa(); 
+
     
     /**
      * Tekee tarvittavat muut alustukset, nyt vaihdetaan TableViewn tilalle
@@ -154,7 +146,33 @@ public class MMFinaalitGUIController implements Initializable {
     private void alusta() {
         chooserFinaalit.clear();
     	chooserFinaalit.addSelectionListener(e -> naytaFinaali());
-    	edits = new TextField[]{editVuosi, editJarjestaja, editVoittaja, editHopeajoukkue}; 
+         
+         edits = TietueDialogController.luoKentat(gridFinaali, apufinaali);  
+         for (TextField edit: edits)  
+             if ( edit != null ) {  
+                 edit.setEditable(false);  
+                 edit.setOnMouseClicked(e -> { if ( e.getClickCount() > 1 ) muokkaa(getFieldId(e.getSource(),0)); });  
+                 edit.focusedProperty().addListener((a,o,n) -> kentta = getFieldId(edit,kentta));
+                 edit.setOnKeyPressed( e -> {if ( e.getCode() == KeyCode.F2 ) muokkaa(kentta);}); 
+             }    
+         // alustetaan harrastustaulukon otsikot 
+         int eka = apuosallistujamaa.ekaKentta(); 
+         int lkm = apuosallistujamaa.getKenttia(); 
+         String[] headings = new String[lkm-eka]; 
+         for (int i=0, k=eka; k<lkm; i++, k++) headings[i] = apuosallistujamaa.getKysymys(k); 
+         tableOsallistujamaat.initTable(headings); 
+         tableOsallistujamaat.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY); 
+         tableOsallistujamaat.setEditable(false); 
+         tableOsallistujamaat.setPlaceholder(new Label("Ei vielä osallistujamaita.")); 
+          
+         // Tämä on vielä huono, ei automaattisesti muutu jos kenttiä muutetaan. 
+         tableOsallistujamaat.setColumnSortOrderNumber(1); 
+         tableOsallistujamaat.setColumnSortOrderNumber(2); 
+         tableOsallistujamaat.setColumnWidth(1, 60); 
+         tableOsallistujamaat.setColumnWidth(2, 60); 
+         
+         tableOsallistujamaat.setOnMouseClicked( e -> { if ( e.getClickCount() > 1 ) muokkaaOsallistujamaata(); } );
+         tableOsallistujamaat.setOnKeyPressed( e -> {if ( e.getCode() == KeyCode.F2 ) muokkaaOsallistujamaata();}); 
     }
     
     
@@ -186,7 +204,7 @@ public class MMFinaalitGUIController implements Initializable {
         finaaliKohdalla = chooserFinaalit.getSelectedObject();
         if (finaaliKohdalla == null) return;
         
-        FinaaliDialogController.naytaFinaali(edits, finaaliKohdalla); 
+        TietueDialogController.naytaTietue(edits, finaaliKohdalla); 
         naytaOsallistujamaat(finaaliKohdalla);    
     }
     
@@ -195,7 +213,7 @@ public class MMFinaalitGUIController implements Initializable {
      * @param finaali
      */
     private void naytaOsallistujamaat(Finaali finaali) {
-        gridOsallistujamaat.clear();
+        tableOsallistujamaat.clear();
         if ( finaali == null ) return;
         
         try {
@@ -204,31 +222,28 @@ public class MMFinaalitGUIController implements Initializable {
             for (Osallistujamaa maa: maat)
                 naytaOsallistujamaa(maa);
         } catch (SailoException e) {
-            // naytaVirhe(e.getMessage());
+            naytaVirhe(e.getMessage());
         } 
     }
 
     
     private void naytaOsallistujamaa(Osallistujamaa maa) {
-        String[] rivi = maa.toString().split("\\|"); // TODO: huono ja tilapäinen ratkaisu
-        gridOsallistujamaat.add(maa,rivi[1], rivi[2]);
-    }
+    	 int kenttia = maa.getKenttia(); 
+         String[] rivi = new String[kenttia-maa.ekaKentta()]; 
+         for (int i=0, k=maa.ekaKentta(); k < kenttia; i++, k++) 
+             rivi[i] = maa.anna(k); 
+         tableOsallistujamaat.add(maa,rivi);
 
-    /**
-     * Finaalin poisto
-     */
-    private void poistaFinaali() {
-		Dialogs.showMessageDialog("Ei osata vielä poistaa!");
-	}
+    }
     
     /**
      * Finaalin muokkaus
      */
-    private void muokkaa() {
+    private void muokkaa(int i) {
     	if ( finaaliKohdalla == null ) return; 
         try { 
             Finaali finaali; 
-            finaali = FinaaliDialogController.kysyFinaali(null, finaaliKohdalla.clone()); 
+            finaali = TietueDialogController.kysyTietue(null, finaaliKohdalla.clone(), i);     
             if ( finaali == null ) return; 
             tietokanta.korvaaTaiLisaa(finaali); 
             hae(finaali.getTunnusNro()); 
@@ -238,6 +253,40 @@ public class MMFinaalitGUIController implements Initializable {
             Dialogs.showMessageDialog(e.getMessage()); 
         }
     }
+    
+    /**
+     * Poistetaan maataulukosta valitulla kohdalla oleva maa. 
+     */
+    private void poistaOsallistujamaa() {
+        int rivi = tableOsallistujamaat.getRowNr();
+        if ( rivi < 0 ) return;
+        Osallistujamaa maa = tableOsallistujamaat.getObject();
+        if ( maa == null ) return;
+        tietokanta.poistaOsallistujamaa(maa);
+        naytaOsallistujamaat(finaaliKohdalla);
+        int maita = tableOsallistujamaat.getItems().size(); 
+        if ( rivi >= maita ) rivi = maita -1;
+        tableOsallistujamaat.getFocusModel().focus(rivi);
+        tableOsallistujamaat.getSelectionModel().select(rivi);
+    }
+
+    
+    /**
+     * Poistetaan listalta valittu finaali
+     */
+    
+    private void poistaFinaali() {
+        Finaali finaali = finaaliKohdalla;
+        if ( finaali == null ) return;
+        if ( !Dialogs.showQuestionDialog("Poisto", "Poistetaanko finaali vuodelta: " + finaali.getVuosi(), "Kyllä", "Ei") )
+            return;
+        tietokanta.poista(finaali);
+        int index = chooserFinaalit.getSelectedIndex();
+        hae(0);
+        chooserFinaalit.setSelectedIndex(index);
+    }
+
+
 
     /**
      * Alustaa finaalin lukemalla sen valitun nimisestä tiedostosta
@@ -294,17 +343,21 @@ public class MMFinaalitGUIController implements Initializable {
      * @param fnro finaalin numero, joka aktivoidaan haun jälkeen
      */
     protected void hae(int fnro) {
-        String ehto = searchField.getText(); 
-        if (ehto.length() > 0)
-        	naytaVirhe(String.format("Ei osata hakea (kenttä: %d, ehto: %s)",ehto));
-        else
-        	naytaVirhe(null);
-        chooserFinaalit.clear();
+    	 
+        int tunnus = fnro; // tunnus finaalin numero, joka aktivoidaan haun jälkeen 
+        if ( tunnus <= 0 ) { 
+            Finaali kohdalla = finaaliKohdalla; 
+            if ( kohdalla != null ) tunnus = kohdalla.getTunnusNro(); 
+        }
+    	String ehto = searchField.getText(); 
+    	if (ehto.indexOf('*') < 0) ehto = "*" + ehto + "*"; 
 
+        chooserFinaalit.clear();
+        int k = apufinaali.ekaKentta();
         int index = 0;
         Collection<Finaali> finaalit;
         try {
-            finaalit = tietokanta.etsi(ehto);
+            finaalit = tietokanta.etsi(ehto, k);
             int i = 0;
             for (Finaali finaali : finaalit ) {
                 if (finaali.getTunnusNro() == fnro) index = i;
@@ -324,14 +377,14 @@ public class MMFinaalitGUIController implements Initializable {
     private void uusiFinaali() {
         try {
         	Finaali uusifinaali = new Finaali();
-            uusifinaali = FinaaliDialogController.kysyFinaali(null, uusifinaali);  
+        	uusifinaali = TietueDialogController.kysyTietue(null, uusifinaali, 1); 
             if ( uusifinaali == null ) return;
             uusifinaali.rekisteroi();
             tietokanta.lisaa(uusifinaali);
             hae(uusifinaali.getTunnusNro());
         } catch (SailoException e) {
             Dialogs.showMessageDialog("Ongelmia uuden luomisessa " + e.getMessage());
-            return;
+          return;
         }
     }
     
@@ -340,14 +393,33 @@ public class MMFinaalitGUIController implements Initializable {
      * Tekee uuden osallistujamaan editointia varten 
      */ 
     public void uusiOsallistujamaa() throws SailoException { 
-        if ( finaaliKohdalla == null ) return;  
-        Osallistujamaa uusiMaa = new Osallistujamaa();  
-        uusiMaa.rekisteroi();  
-        uusiMaa.testiOsallistujamaa(finaaliKohdalla.getTunnusNro());  
-        tietokanta.lisaa(uusiMaa);
-        hae(finaaliKohdalla.getTunnusNro()); 
+    	 Osallistujamaa uusi = new Osallistujamaa(finaaliKohdalla.getTunnusNro());
+		 uusi = TietueDialogController.kysyTietue(null, uusi, 0);
+		 if ( uusi == null ) return;
+		 uusi.rekisteroi();
+		 tietokanta.lisaa(uusi);
+		 naytaOsallistujamaat(finaaliKohdalla); 
+		 tableOsallistujamaat.selectRow(1000);  // järjestetään viimeinen rivi valituksi
     }
-
+    
+    
+    private void muokkaaOsallistujamaata() {
+        int r = tableOsallistujamaat.getRowNr();
+        if ( r < 0 ) return; // klikattu ehkä otsikkoriviä
+        Osallistujamaa maa = tableOsallistujamaat.getObject();
+        if ( maa == null ) return;
+        int k = tableOsallistujamaat.getColumnNr()+maa.ekaKentta();
+        try {
+            maa = TietueDialogController.kysyTietue(null, maa.clone(), k);
+            if ( maa == null ) return;
+            tietokanta.korvaaTaiLisaa(maa); 
+            naytaOsallistujamaat(finaaliKohdalla); 
+            tableOsallistujamaat.selectRow(r);  // järjestetään sama rivi takaisin valituksi
+        } catch (CloneNotSupportedException  e) { /* clone on tehty */  
+        } catch (SailoException e) {
+            Dialogs.showMessageDialog("Ongelmia lisäämisessä: " + e.getMessage());
+        }
+    }
 
        /**
         * @param tietokanta Kerho jota käytetään tässä käyttöliittymässä
@@ -398,8 +470,7 @@ public class MMFinaalitGUIController implements Initializable {
           
           List<Osallistujamaa> osallistujamaat = tietokanta.annaOsallistujamaat(finaali);   
 		  for (Osallistujamaa uusiMaa : osallistujamaat)
-		           uusiMaa.tulosta(os);
-
+		      uusiMaa.tulosta(os);
       }
       
       
@@ -408,11 +479,10 @@ public class MMFinaalitGUIController implements Initializable {
        * @param text alue johon tulostetaan
        * @throws SailoException 
        */
-      public void tulostaValitut(TextArea text) throws SailoException {
+      public void tulostaValitut(TextArea text) throws SailoException{
           try (PrintStream os = TextAreaOutputStream.getTextPrintStream(text)) {
-              os.println("Tulostetaan kaikki finaalit: ");
-              Collection<Finaali> finaalit = tietokanta.etsi(""); 
-              for(Finaali fin: finaalit) {
+              os.println("Tulostetaan finaali vuodelta: " + finaaliKohdalla.getVuosi());
+              for (Finaali fin: chooserFinaalit.getObjects())  {
                   tulosta(os, fin);
                   os.println("\n\n");
               }

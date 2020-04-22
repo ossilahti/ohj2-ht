@@ -8,9 +8,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
+
+import fi.jyu.mit.ohj2.WildChars;
 
 /**
  * Tietorakenteen luokka Finaalit, joka osaa mm. lisätä uuden finaalin tietokantaan.
@@ -37,16 +42,35 @@ public class Finaalit implements Iterable<Finaali> {
 
 
     /**
-     * Lisää uuden jäsenen tietorakenteeseen.  Ottaa jäsenen omistukseensa.
-     * @param jasen lisätäävän jäsenen viite.  Huom tietorakenne muuttuu omistajaksi
+     * Lisää uuden finaalin tietorakenteeseen.  Ottaa finaalin omistukseensa.
+     * @param finaali lisätäävän finaalin viite.  Huom tietorakenne muuttuu omistajaksi
      * @throws SailoException jos tietorakenne on jo täynnä
      */
     public void lisaa(Finaali finaali) throws SailoException {
-        if (lkm >= alkiot.length) throw new SailoException("Liikaa alkioita");
+        if (lkm >= alkiot.length) alkiot = Arrays.copyOf(alkiot, lkm+20);
         alkiot[lkm] = finaali;
         lkm++;
         muutettu = true;
     }
+    
+
+    /** 
+     * Poistaa finaalin jolla on valittu tunnusnumero  
+     * @param id poistettavan finaalin tunnusnumero 
+     * @return 1 jos poistettiin, 0 jos ei löydy 
+     */ 
+    public int poista(int id) { 
+        int ind = etsiId(id); 
+        if (ind < 0) return 0; 
+        lkm--; 
+        for (int i = ind; i < lkm; i++) 
+            alkiot[i] = alkiot[i + 1]; 
+        alkiot[lkm] = null; 
+        muutettu = true; 
+        return 1; 
+    } 
+
+
 
 
     /**
@@ -134,19 +158,48 @@ public class Finaalit implements Iterable<Finaali> {
      * @return lista löytyneistä
      */
     @SuppressWarnings("unused")
-    public Collection<Finaali> etsi(String hakuehto) { 
-        Collection<Finaali> loytyneet = new ArrayList<Finaali>(); 
+    public Collection<Finaali> etsi(String hakuehto, int k) { 
+    	String ehto = "*"; 
+        if ( hakuehto != null && hakuehto.length() > 0 ) ehto = hakuehto; 
+        int hk = k; 
+        if ( hk < 0 ) hk = 0; // jotta etsii id:n mukaan 
+        List<Finaali> loytyneet = new ArrayList<Finaali>(); 
         for (Finaali finaali : this) { 
-            loytyneet.add(finaali);  
+            if (WildChars.onkoSamat(finaali.anna(hk), ehto)) loytyneet.add(finaali);   
         } 
+        Collections.sort(loytyneet, new Finaali.Vertailija(hk)); 
         return loytyneet; 
+
     }
     
     
+    /** 
+     * Etsii finaalin id:n perusteella 
+     * @param id tunnusnumero, jonka mukaan etsitään 
+     * @return jäsen jolla etsittävä id tai null 
+     */ 
+    public Finaali annaId(int id) { 
+        for (Finaali finaali : this) { 
+            if (id == finaali.getTunnusNro()) return finaali; 
+        } 
+        return null; 
+    } 
 
+
+    /** 
+     * Etsii finaalin id:n perusteella 
+     * @param id tunnusnumero, jonka mukaan etsitään 
+     * @return löytyneen finaalin indeksi tai -1 jos ei löydy 
+     */ 
+    public int etsiId(int id) { 
+        for (int i = 0; i < lkm; i++) 
+            if (id == alkiot[i].getTunnusNro()) return i; 
+        return -1; 
+    } 
+    
 
     /**
-     * Lukee finaalin tiedostosta.  Kesken.
+     * Lukee finaalin tiedostosta.
      * @param hakemisto tiedoston hakemisto
      * @throws SailoException jos lukeminen epäonnistuu
      */
