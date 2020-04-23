@@ -263,7 +263,7 @@ public class Finaali implements Cloneable, Tietue {
 	public void tulosta(PrintStream out) {
 		out.println("Finaalin numero: " + getTunnusNro() + " || Vuosi: " + vuosi + " || Järjestäjä: " + finaalipaikka);
 		out.println("Voittaja: " + voittaja + " || Hopeajoukkue: " + hopeajoukkue + " || Lopputulos: " + lopputulos);
-		out.println("Katsojia yhteensä: " + String.format("%6d", katsojia));
+		out.println("Katsojia yhteensä: " + katsojia);
 	}
 
 	/**

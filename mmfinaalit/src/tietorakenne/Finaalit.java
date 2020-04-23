@@ -237,9 +237,8 @@ public class Finaalit implements Iterable<Finaali> {
     
     /**
      * Tallennetaan alkiot.
-     * @throws SailoException
+     * @throws SailoException jos ei mahdu
      */
-
     public void tallenna() throws SailoException {
         if ( !muutettu ) return;
 
@@ -263,9 +262,6 @@ public class Finaalit implements Iterable<Finaali> {
         muutettu = false;
     }
     
-    
-
-
 
     /**
      * Palauttaa Kerhon koko nimen

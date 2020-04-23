@@ -18,7 +18,7 @@ import java.util.*;
 public class Osallistujamaat implements Iterable<Osallistujamaa> {
 	
     private boolean muutettu = false;
-    private String tiedostonPerusNimi = "";
+    private String tiedostonPerusNimi = "osallistujamaat";
     
     /** Taulukko osallistujamaista */
     private final List<Osallistujamaa> alkiot        = new ArrayList<Osallistujamaa>();
@@ -191,13 +191,14 @@ public class Osallistujamaat implements Iterable<Osallistujamaa> {
     public void lueTiedostosta(String tied) throws SailoException {
         setTiedostonPerusNimi(tied);
         try ( BufferedReader fi = new BufferedReader(new FileReader(getTiedostonNimi())) ) {
-
-            String rivi;
+            String rivi = fi.readLine();
+            if ( rivi == null ) throw new SailoException("Maksimikoko puuttuu");
+            
             while ( (rivi = fi.readLine()) != null ) {
                 rivi = rivi.trim();
                 if ( "".equals(rivi) || rivi.charAt(0) == ';' ) continue;
                 Osallistujamaa maa = new Osallistujamaa();
-                maa.parse(rivi); // voisi olla virhekäsittely
+                maa.parse(rivi); 
                 lisaa(maa);
             }
             muutettu = false;
@@ -281,7 +282,7 @@ public class Osallistujamaat implements Iterable<Osallistujamaa> {
      */
     public List<Osallistujamaa> annaOsallistujamaat(int finaalinTunnusNro) {
         List<Osallistujamaa> loydetyt = new ArrayList<Osallistujamaa>();
-        for (Osallistujamaa maa : this)
+        for (Osallistujamaa maa : alkiot)
             if (maa.getFinaaliNro() == finaalinTunnusNro) loydetyt.add(maa);
         return loydetyt;
     }
