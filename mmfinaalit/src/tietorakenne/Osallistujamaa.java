@@ -149,7 +149,7 @@ public class Osallistujamaa implements Cloneable, Tietue {
      */
     @Override
     public int getKenttia() {
-        return 2;
+        return 3;
     }
 
 
@@ -158,7 +158,7 @@ public class Osallistujamaa implements Cloneable, Tietue {
      */
     @Override
     public int ekaKentta() {
-        return 1;
+        return 2;
     }
     
 
@@ -170,8 +170,10 @@ public class Osallistujamaa implements Cloneable, Tietue {
     public String getKysymys(int k) {
         switch (k) {
             case 0:
-                return "id";
+                return "Id";
             case 1:
+            	return "Finaalin Id";
+            case 2:
             	return "Osallistujamaa";
             default:
                 return "???";
@@ -189,6 +191,8 @@ public class Osallistujamaa implements Cloneable, Tietue {
             case 0:
                 return "" + tunnusNro;
             case 1:
+            	return "" + finaaliNro;
+            case 2:
                 return "" + osallistujamaa;
             default:
                 return "???";
@@ -212,6 +216,9 @@ public class Osallistujamaa implements Cloneable, Tietue {
                 setTunnusNro(Mjonot.erota(sb, '$', getTunnusNro()));
                 return null;
             case 1:
+            	finaaliNro = Mjonot.erota(sb, '$', finaaliNro);
+            	return null;
+            case 2:
                 osallistujamaa = st;
                 return null;
             default:
