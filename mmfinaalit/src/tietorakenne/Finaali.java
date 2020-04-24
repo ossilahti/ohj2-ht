@@ -6,7 +6,6 @@ import java.util.Comparator;
 
 import fi.jyu.mit.ohj2.Mjonot;
 
-///import javafx.beans.property.SimpleStringProperty;
 
 /**
  * Finaali-luokka joka rekisteröi finaalin Finaalit-luokkaan.
@@ -447,19 +446,7 @@ public class Finaali implements Cloneable, Tietue {
 
 	/**
 	 * Tehdään identtinen klooni finaalista
-	 * 
 	 * @return Object kloonattu finaali
-	 * @example
-	 * 
-	 *          <pre name="test">
-	 * #THROWS CloneNotSupportedException 
-	 *   Jasen jasen = new Jasen();
-	 *   jasen.parse("   3  |  Ankka Aku   | 123");
-	 *   Jasen kopio = jasen.clone();
-	 *   kopio.toString() === jasen.toString();
-	 *   jasen.parse("   4  |  Ankka Tupu   | 123");
-	 *   kopio.toString().equals(jasen.toString()) === false;
-	 *          </pre>
 	 */
 	@Override
 	public Finaali clone() throws CloneNotSupportedException {

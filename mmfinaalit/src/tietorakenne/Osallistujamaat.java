@@ -49,27 +49,6 @@ public class Osallistujamaat implements Iterable<Osallistujamaa> {
      * niin lisätään uutena harrastuksena.
      * @param maa lisättävän osallistujamaan viite.  Huom tietorakenne muuttuu omistajaksi
      * @throws SailoException jos tietorakenne on jo täynnä
-     * @example
-     * <pre name="test">
-     * #THROWS SailoException,CloneNotSupportedException
-     * #PACKAGEIMPORT
-     * Harrastukset harrastukset = new Harrastukset();
-     * Harrastus har1 = new Harrastus(), har2 = new Harrastus();
-     * har1.rekisteroi(); har2.rekisteroi();
-     * harrastukset.getLkm() === 0;
-     * harrastukset.korvaaTaiLisaa(har1); harrastukset.getLkm() === 1;
-     * harrastukset.korvaaTaiLisaa(har2); harrastukset.getLkm() === 2;
-     * Harrastus har3 = har1.clone();
-     * har3.aseta(2,"kkk");
-     * Iterator<Harrastus> i2=harrastukset.iterator();
-     * i2.next() === har1;
-     * harrastukset.korvaaTaiLisaa(har3); harrastukset.getLkm() === 2;
-     * i2=harrastukset.iterator();
-     * Harrastus h = i2.next();
-     * h === har3;
-     * h == har3 === true;
-     * h == har1 === false;
-     * </pre>
      */ 
     public void korvaaTaiLisaa(Osallistujamaa maa) throws SailoException {
         int id = maa.getTunnusNro();
@@ -87,27 +66,7 @@ public class Osallistujamaat implements Iterable<Osallistujamaa> {
     /**
      * Poistaa valitun maan
      * @param maa poistettava maa
-     * @return tosi jos löytyi poistettava tietue 
-     * @example
-     * <pre name="test">
-     * #THROWS SailoException 
-     * #import java.io.File;
-     *  Harrastukset harrasteet = new Harrastukset();
-     *  Harrastus pitsi21 = new Harrastus(); pitsi21.vastaaPitsinNyplays(2);
-     *  Harrastus pitsi11 = new Harrastus(); pitsi11.vastaaPitsinNyplays(1);
-     *  Harrastus pitsi22 = new Harrastus(); pitsi22.vastaaPitsinNyplays(2); 
-     *  Harrastus pitsi12 = new Harrastus(); pitsi12.vastaaPitsinNyplays(1); 
-     *  Harrastus pitsi23 = new Harrastus(); pitsi23.vastaaPitsinNyplays(2); 
-     *  harrasteet.lisaa(pitsi21);
-     *  harrasteet.lisaa(pitsi11);
-     *  harrasteet.lisaa(pitsi22);
-     *  harrasteet.lisaa(pitsi12);
-     *  harrasteet.poista(pitsi23) === false ; harrasteet.getLkm() === 4;
-     *  harrasteet.poista(pitsi11) === true;   harrasteet.getLkm() === 3;
-     *  List<Harrastus> h = harrasteet.annaHarrastukset(1);
-     *  h.size() === 1; 
-     *  h.get(0) === pitsi12;
-     * </pre>
+     * @return tosi jos löytyi poistettava tietue
      */
     public boolean poista(Osallistujamaa maa) {
         boolean ret = alkiot.remove(maa);
@@ -147,27 +106,6 @@ public class Osallistujamaat implements Iterable<Osallistujamaa> {
      * Poistaa kaikki tietyn tietyn finaalin osallistujat
      * @param tunnusNro viite siihen, mihin liittyvät tietueet poistetaan
      * @return montako poistettiin 
-     * @example
-     * <pre name="test">
-     *  Harrastukset harrasteet = new Harrastukset();
-     *  Harrastus pitsi21 = new Harrastus(); pitsi21.vastaaPitsinNyplays(2);
-     *  Harrastus pitsi11 = new Harrastus(); pitsi11.vastaaPitsinNyplays(1);
-     *  Harrastus pitsi22 = new Harrastus(); pitsi22.vastaaPitsinNyplays(2); 
-     *  Harrastus pitsi12 = new Harrastus(); pitsi12.vastaaPitsinNyplays(1); 
-     *  Harrastus pitsi23 = new Harrastus(); pitsi23.vastaaPitsinNyplays(2); 
-     *  harrasteet.lisaa(pitsi21);
-     *  harrasteet.lisaa(pitsi11);
-     *  harrasteet.lisaa(pitsi22);
-     *  harrasteet.lisaa(pitsi12);
-     *  harrasteet.lisaa(pitsi23);
-     *  harrasteet.poistaJasenenHarrastukset(2) === 3;  harrasteet.getLkm() === 2;
-     *  harrasteet.poistaJasenenHarrastukset(3) === 0;  harrasteet.getLkm() === 2;
-     *  List<Harrastus> h = harrasteet.annaHarrastukset(2);
-     *  h.size() === 0; 
-     *  h = harrasteet.annaHarrastukset(1);
-     *  h.get(0) === pitsi11;
-     *  h.get(1) === pitsi12;
-     * </pre>
      */
     public int poistaFinaalinOsallistujat(int tunnusNro) {
         int n = 0;

@@ -57,24 +57,13 @@ public class MMFinaalitGUIController implements Initializable {
         alusta();  
     }  
 
-    /**
-     * Tietoja ikkunan painallus
-     */
 	@FXML private void handleAboutWindow() {
 		ModalController.showModal(MMFinaalitGUIController.class.getResource("AboutWindow.fxml"), "Infoikkuna", null, "");
 	}
 
-	/**
-	 * Apua ikkunan painallus
-	 */
-	
 	@FXML private void handleHelpWindow() {
 	    helpWindow();
 	}
-	
-	/**
-	 * Tallentaa napista tiedot.
-	 */
 	
 	@FXML private void handleTallenna() {
 		tallenna();
@@ -84,20 +73,11 @@ public class MMFinaalitGUIController implements Initializable {
 		muokkaa(kentta);
 	}
 
-	
-	/**
-	 * Lopeta luokan metodi
-	 */
-	
-
     @FXML private void handleExit() {
     	tallenna();
         Platform.exit();
     } 
 	
-	/**
-	 * Poista finaali metodin handleri
-	 */
 	@FXML private void handleRemoveFinal() {
 		poistaFinaali();
 	}
@@ -106,9 +86,6 @@ public class MMFinaalitGUIController implements Initializable {
 		poistaOsallistujamaa();
 	}
 	
-	/**
-	 * Hakuehtoon kun kirjoittaa, mitä tapahtuu:
-	 */
 	
 	@FXML private void handleHakuehto() {
 		hae(0); 

@@ -37,7 +37,7 @@ public class MMFinaalitMain extends Application {
             if ( params.getRaw().size() > 0 ) 
             	tietokantaCtrl.lueTiedosto(params.getRaw().get(0));  
             else 
-            	if (!tietokantaCtrl.avaa()) Platform.exit();
+            	Platform.exit();
 
         } catch(Exception e) {
             e.printStackTrace();

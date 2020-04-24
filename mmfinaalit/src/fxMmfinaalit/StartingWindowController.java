@@ -9,7 +9,7 @@ import javafx.stage.Stage;
 /**
  * Kystään finaalin nimi ja luodaan tätä varten dialogi.
  * 
- * @author Ossi L
+ * @author Ossi Lahti
  * @version 2.4.2020
  */
 public class StartingWindowController implements ModalControllerInterface<String> {
