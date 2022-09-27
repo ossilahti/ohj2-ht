@@ -1,13 +1,11 @@
-# pohja
+# Ohjelmointi 2 practical study
 
-Harjoitustyöni on "Tietokanta jalkapallon MM-finaaleista".
+Repository for a school course made in the start of 2020.
+It acts as a database for the world cup finals of football. 
 
-Projektissani tarkoitukseni on kerätä dataa finaalipeleistä ja lisätä tietokantaan ainakin seuraavat asiat:
+Project goals 10.1.2020 (in finnish):  
+
+"Projektissani tarkoitukseni on kerätä dataa finaalipeleistä ja lisätä tietokantaan ainakin seuraavat asiat:
 vuosi, järjestäjämaa, voittajamaa, kakkoseksi tullut maa, finaalin lopputulos ja katsojamäärä finaalipelissä.
 Työstäni on tarkoitus tulla tietokanta, jota pystyy selaamaan, mutta sinne ei kuka tahansa pysty lisäämään 
-uusia 'finaaleita'.
-
-Ryhmä: otvlahti
-
-Lue käyttöohjeet TIMistä: <https://tim.jyu.fi/view/kurssit/tie/ohj2/tyokalut/git/ohj2git#fork>
-
+uusia 'finaaleita'".
